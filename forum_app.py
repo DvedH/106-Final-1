@@ -3,7 +3,7 @@
 
 from flask import Flask
 from flask import request
-from flask import abort, render_template
+from flask import abort, render_template, redirect, session
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_admin import Admin
@@ -12,6 +12,7 @@ from datetime import datetime
 from enum import Enum
 from urllib.parse import parse_qs
 from urllib.parse import urlparse
+import bcrypt
 import sys
 import json
 
@@ -66,30 +67,117 @@ with app.app_context():
     admin.add_view(ModelView(forumID,db.session))
 
 
+    @app.route('/')
+    def start():
+        return render_template('register.html')
 
 
-    #Routing of website routes are below.
-    @app.route('/')#Login page
+    # Routing of website routes are below.
+    @app.route('/login', methods=['POST'])  # Login page
     def login():
-        return "login page here"
+        name = request.form['usn']
+        pswd = request.form['psw']
+
+        user = Users.query.filter_by(userID=name).first()
+
+        if not user:
+            return render_template('login.html', info="wrong Username")
+        if bcrypt.checkpw(pswd.encode('utf-8'), user.password):
+            session["user"] = name
+            return redirect('/homePage')
+        else:
+            return render_template('login.html', info="wrong Password")
 
 
-
-
-    @app.route('/register') #Show register page
+    @app.route('/register', methods=['POST'])  # Show register page
     def register():
-        return "register page here"
+        usn = request.form['usn']
+        pswd = request.form['psw']
+        new = True
+        if Users.query.filter_by(userID=usn).first():
+            check = Users.query.filter_by(userID=usn).first()
+            print(check.userID)
+            new = False
 
-    @app.route('/anime')
-    def anime():
-        #Queue all posts in with the anime tag.
-        return "anime forum page"
+        if not usn:
+            return render_template('register.html', info="Please provide an Username")
 
-    @app.route('/games')
-    def games():
-        #Queue all posts in with the games tag-
-        return "game forum page"
+        if not pswd:
+            return render_template('register.html', info="Please provide a password")
 
+        if not new:
+            if check.userID == usn:
+                return render_template('register.html', info="This Username is already taken")
+
+        hashed = bcrypt.hashpw(pswd.encode('utf-8'), bcrypt.gensalt())
+
+        db.session.add(Users(userID=usn, password=hashed))
+        db.session.commit()
+        return render_template('login.html', info="Welcome " + usn + "!")
+
+
+    @app.route('/loginRedirect', methods=['GET'])
+    def lRedir():
+        return render_template("/login.html")
+
+
+    @app.route('/LookAtThread', methods=['POST'])
+    def discussion():
+        username = session["user"]
+        result = ForumPost.query.all()
+        search = request.form['Post']
+        print(search)
+        find = {}
+        counter = 0
+        c = 0;
+        if not search:
+            return render_template('HomePage.html', name=username, error="type something to search for it")
+
+        for i in result:
+            counter += 1
+
+        for h in result:
+            if search == h.text:
+                c += 1
+                usrname = h.userID
+                time = h.time
+                tags= h.tag
+                id = h.id
+
+                print(usrname)
+                print(time)
+                print(tags)
+
+        if c == 1:
+            return render_template('Thread.html', YOU=username, postID=id, OPUsername=usrname, Time=time, Tags=tags, OpText=search)
+        else:
+            return render_template('HomePage.html', name=username, error="Couldn't find the post")
+
+    @app.route('/registerRedirect', methods=['GET'])
+    def rRedir():
+        return render_template("/register.html")
+
+
+    @app.route('/homePage')
+    def homePage():
+        username = session["user"]
+        return render_template('HomePage.html', name=username)
+
+
+    @app.route('/FillTags', methods=["GET"])
+    def fill():
+        result = forumID.query.all()
+        counter = 0;
+        for i in result:
+            counter +=1
+        tags = {}
+
+        for r in range(0,counter):
+            tags[r] = {}
+            tags[r]["tag"] = result[r].tag
+
+        print(session["user"])
+        return tags
     #USER FUNCTIONS
 
     #Allow user to make a post on a forum board.
@@ -98,6 +186,7 @@ with app.app_context():
     def PostOnForum(username):
         #Query all users & content from the post method.
         contents = request.get_json(silent=True)
+        print(contents)
         userPost = Users.query.all()
         #Find if this is a valid user so they can post.
         result = db.session.execute(db.select(Users.userID).where(Users.userID == username))
@@ -113,19 +202,38 @@ with app.app_context():
         return ""
 
     #Show all posts.
-    @app.route('/showPosts', methods = ['GET'])
-    def getPosts():
+    @app.route('/showPosts/<string:tag>', methods=['POST'])
+    def getPosts(tag):
+
+        results = ForumPost.query.all()
+        counter = 0;
+        posts = {}
+        print(tag)
+
+        for h in results:
+            if tag in h.tag:
+                counter += 1
+                posts[counter] = h.text
+
+        print(posts)
+
+        '''
         animeURL = request.url
+        print(animeURL)
+
         parsed_animeURL = urlparse(animeURL)
         query_string = parsed_animeURL.query
         query_var = parse_qs(query_string)
         print(query_var)
-        if ("tag" in query_var  ):
+        print("printed query_var")
+
+        if ("tags" in query_var):
             taggedPost = query_var["tag"]
         else:
             taggedPost = ""
 
         print(taggedPost)
+        print("tagged post")
 
         allPosts = ForumPost.query.all()
         tag_var = taggedPost.pop()
@@ -133,7 +241,22 @@ with app.app_context():
         for i in allPosts:
             if (tag_var == "" or tag_var in i.tag):
                 posts[i.id] = i.text
+        print (posts)
+        return posts'''
+        return posts
 
+
+    @app.route('/showAllPosts', methods = ['GET'])
+    def getAllPosts():
+        print("hello")
+        queuedPosts = ForumPost.query.all()
+        posts = {}
+        for i in queuedPosts:
+            posts[i.id] = i.text
+            print (i.id)
+            print(i)
+
+        print(posts)
         return posts
 
     #Show threads -> This is just making a new link, showing the post, and then including the ability to make a forumReply
@@ -174,6 +297,7 @@ with app.app_context():
     #This will show all of the replies for each thread!
     @app.route('/showReply/<string:threadID>', methods = ['GET'])
     def ShowThreadReplies(threadID):
+        print(threadID)
         #Queue up all of the forum replies.
         threadReply = ForumReply.query.all()
         replies = {}
@@ -181,9 +305,9 @@ with app.app_context():
         #Add all replies that match.
         for i in threadReply:
             if(threadID == i.recipient):
-                replies[i.time] = i.text
+                replies[i.userID] = i.text
+                print(replies)
         return replies
-
 
     #Allow user to upvote a post -- RAN OUT OF TIME FOR DEVELOPMENT
     #@app.route('/getThread/<string:id>/upvotePost', methods = ['PUT'])
