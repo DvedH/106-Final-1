@@ -82,7 +82,7 @@ with app.app_context():
 
         if not user:
             return render_template('login.html', info="wrong Username")
-        if bcrypt.checkpw(pswd.encode('utf-8'), user.password):
+        if bcrypt.checkpw(pswd.encode('utf8'), user.password.encode('utf8')):
             session["user"] = name
             return redirect('/homePage')
         else:
@@ -109,7 +109,7 @@ with app.app_context():
             if check.userID == usn:
                 return render_template('register.html', info="This Username is already taken")
 
-        hashed = bcrypt.hashpw(pswd.encode('utf-8'), bcrypt.gensalt())
+        hashed = bcrypt.hashpw(pswd.encode('utf8'), bcrypt.gensalt())
 
         db.session.add(Users(userID=usn, password=hashed))
         db.session.commit()
@@ -301,12 +301,17 @@ with app.app_context():
         #Queue up all of the forum replies.
         threadReply = ForumReply.query.all()
         replies = {}
-        #From this class, we will find all of the replies that have the same threadID
-        #Add all replies that match.
+        counter = 0
+        # From this class, we will find all of the replies that have the same threadID
+        # Add all replies that match.
         for i in threadReply:
-            if(threadID == i.recipient):
-                replies[i.userID] = i.text
-                print(replies)
+            if (threadID == i.recipient):
+                counter+=1
+                replies[counter] = {}
+                replies[counter]["User"] = i.userID
+                replies[counter]["Message"] = i.text
+
+        print(replies)
         return replies
 
     #Allow user to upvote a post -- RAN OUT OF TIME FOR DEVELOPMENT
