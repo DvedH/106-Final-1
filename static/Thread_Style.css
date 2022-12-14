@@ -21,13 +21,13 @@ div.thread {
 
 }
 
-.REPLY:nth-of-type(2n+1){
+.REPLY:nth-of-type(2n){
     height: 200px;
     width: 80%;
     background-color:rgb(179, 120, 255);
 }
 
-.REPLY:nth-of-type(n){
+.REPLY:nth-of-type(2n+1){
     height: 200px;
     width: 80%;
     background-color:rgb(179, 255, 201);
