@@ -8,7 +8,7 @@ header {
 #space {
   width: 300px;
   height: 200px;
-  background-color: rgb(199, 192, 99);
+     background-color: rgb(120, 255, 160);
   border-style: solid;
   border-color: darkblue;
   margin: 0 auto;
@@ -46,11 +46,17 @@ label {
   font-size: 35px;
   align-self: center;
   width: 100%;
-  background-color: rgb(77, 151, 236);
+  background-color:  rgb(68, 201, 108);
   border-radius: 8px;
   border: none;
 }
-
+#goReg  {
+  align-self: center;
+  width: 100%;
+  background-color:  rgb(68, 201, 108);
+  border-radius: 8px;
+  border: none;
+}
 button {
   font-size: 35px;
   align-self: center;
@@ -64,7 +70,9 @@ button {
   background-color: rgb(206, 206, 255);
 }
 
-
+#goReg:hover {
+  background-color: rgb(206, 206, 255);
+}
 body {
-  background-color: rgb(138, 173, 204);
+	background-color: rgb(108, 68, 201);
 }
