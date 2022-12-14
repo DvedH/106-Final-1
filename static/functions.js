@@ -1,7 +1,7 @@
 
     async function Fill() {
         // GET request, update list on response
-        res = fetch('http://127.0.0.1:5000/FillTags', {
+        res = fetch('https://ansony3.pythonanywhere.com/FillTags', {
             method: 'GET'
         })
             .then((response) => response.json())
@@ -12,7 +12,7 @@
         // GET request, update list on response
         thread = document.getElementById("postID").innerHTML;
         console.log("hello")
-        res = fetch('http://127.0.0.1:5000/showReply/'+thread, {
+        res = fetch('https://ansony3.pythonanywhere.com/showReply/'+String(thread), {
             method: 'GET'
         })
             .then((response) => response.json())
@@ -41,7 +41,7 @@
         console.log( $( this ).text() )
         meth = $( this ).text();
         if (meth == "All Posts") {
-            res = fetch('http://127.0.0.1:5000/showAllPosts', {
+            res = fetch('https://ansony3.pythonanywhere.com/showAllPosts', {
                 method: 'GET'
             })
             .then((response) => response.json())
@@ -58,7 +58,7 @@
             console.log(urlTag)
 
             window.history.pushState("data","Title",urlTag);
-            res = fetch('http://127.0.0.1:5000/showPosts/'+tag, {
+            res = fetch('https://ansony3.pythonanywhere.com/showPosts/'+tag, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'text/plain'
@@ -124,8 +124,8 @@
         // update the gradebook with fresh list of grades
         for (var item in data) {
             replynum+=1
-            entry = "<p>" +"Reply#: "+ replynum+ " "+ String(item) + "</p>"+ "\n"
-            entry += "<p>" + String(data[item]) + "</p>"+ "\n"
+            entry = "<p>" +"Reply#: "+ replynum+ " "+ data[item]["User"] + "</p>"+ "\n"
+            entry += "<p>" + String(data[item]["Message"]) + "</p>"+ "\n"
             var element = document.createElement('div')
             element.className = "REPLY";
             element.innerHTML = entry
@@ -149,12 +149,12 @@ $(document).ready(function(){
             tags += String("games,")
         }
         var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "http://ansony3.pythonanywhere.com/" + encodeURIComponent(username) + "/post" );
+        xhttp.open("POST", "https://ansony3.pythonanywhere.com/" + encodeURIComponent(username) + "/post" );
         xhttp.setRequestHeader("Content-Type", "application/json");
         const body = {"username": username,"tags": tags.length==0?"none" : tags.substring(0, tags.length -1), "text": text };
         xhttp.send(JSON.stringify(body));
         xhttp.onload = function() {
-            res = fetch('http://127.0.0.1:5000/showAllPosts', {
+            res = fetch('https://ansony3.pythonanywhere.com/showAllPosts', {
                 method: 'GET'
             })
             .then((response) => response.json())
@@ -173,7 +173,7 @@ $(document).ready(function(){
         console.log(threadID)
         console.log(text)
         var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "http://127.0.0.1:5000/" + username +"/"+ threadID + "/forumReply" );
+        xhttp.open("POST", "https://ansony3.pythonanywhere.com/" + username +"/"+ threadID + "/forumReply" );
         xhttp.setRequestHeader("Content-Type", "application/json");
         const body = {"username": username,"tags": tags.length==0?"none" : tags.substring(0, tags.length -1), "text": text };
         xhttp.send(JSON.stringify(body));
@@ -188,7 +188,7 @@ $(document).ready(function(){
         var postID;
         var xhttp = new XMLHttpRequest();
         postID = document.getElementById("postID").innerHTML;
-        xhttp.open("PUT", "http://127.0.0.1:5000/getThread/" + encodeURIComponent(threadID) + "/upvotePost");
+        xhttp.open("PUT", "https://ansony3.pythonanywhere.com/" + encodeURIComponent(threadID) + "/upvotePost");
         xhttp.setRequestHeader("Content-Type", "application/json");
         const body = {"postID": postID};
         xhttp.send(JSON.stringify(body));
