@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <title>Profile</title>
+    <link rel="stylesheet"  href="{{ url_for('static', filename='Thread_Style.css')}}">
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+</head>
+<body>
+    <Header><h1>Mega Web</h1></Header>
+    <div class="thread">
+        <div class="OP">
+            <div class="PostInfo" style="color: lightGreen; font-weight:bold;" >OP: {{OPUsername}}<div id="postID">{{postID}}</div></div>
+            <p>||Tags: {{Tags}}||Time Posted: {{Time}}||</p>
+            <p>{{OpText}}</p>
+
+        </div>
+        <button id="replyViewer" onclick="replies()">View Replies</button>
+        <div id="RIGHT">
+                <div id="You">{{YOU}}</div>
+            <textarea id="forumReply" rows="15%" cols="45%" placeholder="Type here to reply"></textarea>
+            <div><button class="postReply" style="float: right">Reply</button></div>
+        </div>
+        <div id="thread">
+
+
+        </div>
+    </div>
+</body>
+<script src ="{{ url_for('static', filename='functions.js')}}"></script>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <title>Profile</title>
+    <link rel="stylesheet"  href="{{ url_for('static', filename='Home_Style.css')}}">
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+</head>
+
+<body>
+
+    <div id = "HEADER">
+        <header style="font-size: 40pt" >
+            Welcome to the site 😎
+
+        </header>
+    </div>
+    <div id="parent">
+        <div id="left">left
+            <button  onclick="Fill()">Tags</button>
+            <ul id ="tContent">
+                <li class="tagBtn">All Posts</li>
+            </ul>
+        </div>
+        <div id="right">
+            <h1 id="username">{{name}}</h1>
+            <form action="/LookAtThread" method="POST">
+
+                <p>{{error}}</p>
+                <div>
+                    <input id="button" type="submit" value="Search">
+                    <label class="label">Post</label>
+                    <input id="Post" style="width: 20%" type="text" name="Post" placeholder="write the text of the post">
+
+                </div>
+            </form>
+            <ol id ="rright">
+                <li> </li>
+            </ol>
+            <table>
+
+            </table>
+            <ol>
+
+            </ol>
+        </div>
+        <div id="rightFooter">
+            <textarea id="forumText" name="forumText"  placeholder="Forum text contents here"></textarea>
+            <button class = "postComment"> Post</button>
+            <div id="infoSub"><label>
+                <input type="checkbox" id="animeCheckbox" value="value">Anime</label>
+                <label><input type="checkbox" id="gamesCheckbox" value="value">Games</label>
+            </div>
+        </div>
+    </div>
+</body>
+ <script src ="{{ url_for('static', filename='functions.js')}}"></script>
+</html>
